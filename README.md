@@ -27,6 +27,23 @@ sudo mv vcurl /usr/local/bin/vcurl
 sudo chmod +x /usr/local/bin/vcurl
 ```
 
+### macOS
+
+Run the `vcurl-macos-install.sh` script. Change the path in the script if you want to.
+
+To install manually:
+
+1. Download the latest release from the [GitHub Releases Page](https://github.com/jiura/vcurl/releases)
+2. Extract the `vcurl-macos-vX.Y.Z.tar.gz` file
+3. Move the `vcurl` binary to `/usr/local/bin` (or your path of choosing):
+```bash
+sudo mv vcurl /usr/local/bin/vcurl
+```
+4. Make sure it's executable:
+```bash
+sudo chmod +x /usr/local/bin/vcurl
+```
+
 ### Windows
 
 Run the `vcurl-windows-install.bat` script. Change the path in the script if you want to.
@@ -55,6 +72,12 @@ Make sure you have Go installed.
 
 ```bash
 go build -o path/you/want/vcurl
+```
+
+### macOS
+
+```bash
+GOOS=darwin GOARCH=amd64 go build -o path/you/want/vcurl
 ```
 
 ### Windows
