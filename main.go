@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/gdamore/tcell/v2"
-	"github.com/rivo/tview"
+	"github.com/jiura/tview"
 )
 
 var req_form *tview.Form
@@ -71,10 +71,14 @@ func main() {
 	app := tview.NewApplication()
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		// TODO: Do I really want to close on Esc? Kinda easy to fat-finger...
-		if event.Key() == tcell.KeyCtrlQ || event.Key() == tcell.KeyEsc {
+		switch event.Key() {
+		case tcell.KeyCtrlQ:
+			fallthrough
+		case tcell.KeyEsc:
 			app.Stop()
-		} else if event.Key() == tcell.KeyCtrlS {
+		case tcell.KeyCtrlC:
+			return tcell.NewEventKey(tcell.KeyCtrlC, 0, tcell.ModNone)
+		case tcell.KeyCtrlS:
 			resp_status.SetText("Loading...")
 			resp_headers.SetText("Loading...")
 			resp_body.SetText("Loading...")
@@ -116,6 +120,19 @@ func main() {
 		case tcell.KeyTab:
 			return tcell.NewEventKey(tcell.KeyRune, ' ', tcell.ModNone)
 		case tcell.KeyBacktab:
+			return nil
+		}
+
+		return event
+	})
+
+	req_form_body := req_form.GetFormItem(2).(*tview.TextArea)
+	req_form_body.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyCtrlC {
+			if req_form_body.HasSelection() {
+				text, _, _ := req_form_body.GetSelection()
+				app.GetScreen().SetClipboard([]byte(text))
+			}
 			return nil
 		}
 
@@ -185,12 +202,21 @@ func main() {
 
 	resp_status = tview.NewTextView()
 	resp_status.SetBorder(true).SetTitle("Response Status").SetTitleAlign(tview.AlignRight)
+	resp_status.SetChangedFunc(func() {
+		app.ForceDraw()
+	})
 
 	resp_headers = tview.NewTextView().SetScrollable(true)
 	resp_headers.SetBorder(true).SetTitle("Response Headers").SetTitleAlign(tview.AlignRight)
+	resp_headers.SetChangedFunc(func() {
+		app.ForceDraw()
+	})
 
 	resp_body = tview.NewTextView().SetScrollable(true)
 	resp_body.SetBorder(true).SetTitle("Response Body").SetTitleAlign(tview.AlignRight)
+	resp_body.SetChangedFunc(func() {
+		app.ForceDraw()
+	})
 
 	right_flex = tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(resp_status, 0, 1, false).
