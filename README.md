@@ -71,7 +71,7 @@ Make sure you have Go installed.
 ### Linux
 
 ```bash
-go build -o path/you/want/vcurl
+GOOS=linux GOARCH=amd64 go build -o path/you/want/vcurl
 ```
 
 ### macOS
